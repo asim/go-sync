@@ -1,4 +1,4 @@
-# Go Sync
+# Go Sync [![License](https://img.shields.io/:license-apache-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![GoDoc](https://godoc.org/github.com/micro/go-sync?status.svg)](https://godoc.org/github.com/micro/go-sync)
 
 Go Sync is a synchronization framework for distributed systems.
 
