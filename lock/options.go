@@ -7,7 +7,7 @@ import (
 // Nodes sets the addresses the underlying lock implementation
 func Nodes(a ...string) Option {
 	return func(o *Options) {
-		o.Nodes = append(o.Nodes, a...)
+		o.Nodes = a
 	}
 }
 
