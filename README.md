@@ -25,7 +25,7 @@ We offer three primitives; Lock, Leader and KV
 ```go
 import "github.com/micro/go-sync/lock/consul"
 
-l := lock.NewLock()
+l := consul.NewLock()
 
 // acquire lock
 err := lock.Acquire("id")
@@ -39,9 +39,12 @@ err = lock.Release("id")
 ## Leadership
 
 ```go
-import "github.com/micro/go-sync/leader/consul"
+import (
+	"github.com/micro/go-sync/leader"
+	"github.com/micro/go-sync/leader/consul"
+)
 
-l := leader.NewLeader(
+l := consul.NewLeader(
 	leader.Group("name"),
 )
 
@@ -75,7 +78,7 @@ import (
 	"github.com/micro/go-sync/kv/consul"
 )
 
-keyval := kv.NewKV()
+keyval := consul.NewKV()
 
 err := keyval.Put(&kv.Item{
 	Key: "foo",
