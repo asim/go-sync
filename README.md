@@ -10,8 +10,81 @@ an external database or eventing system. Go Sync provides a framework for synchr
 
 We offer three primitives; Lock, Leader and KV
 
-- Lock - distributed locking 
-- Leader - leader election
-- KV - distributed key value
+- Lock -  distributed locking 
+- Leader - leadership election
+- KV - key value storage
+
+## Getting Started
+
+- [Locking](#locking) - exclusive resource access
+- [Leadership](#leadership) - single leader group coordination
+- [Key-Value](#key-value) - simple distributed data storage
+
+## Locking
+
+```go
+import "github.com/micro/go-sync/lock/consul"
+
+l := lock.NewLock()
+
+// acquire lock
+err := lock.Acquire("id")
+// handle err
+
+// release lock
+err = lock.Release("id")
+// handle err
+```
+
+## Leadership
+
+```go
+import "github.com/micro/go-sync/leader/consul"
+
+l := leader.NewLeader(
+	leader.Group("name"),
+)
+
+// elect leader
+e, err := l.Elect("id")
+// handle err
 
 
+// operate while leader
+revoked := e.Revoked()
+
+for {
+	select {
+	case <-revoked:
+		// re-elect
+		e.Elect("id")
+	default:
+		// leader operation
+	}
+}
+
+// resign leadership
+e.Resign() 
+```
+
+## Key-Value
+
+```go
+import (
+	"github.com/micro/go-sync/kv"
+	"github.com/micro/go-sync/kv/consul"
+)
+
+keyval := kv.NewKV()
+
+err := keyval.Put(&kv.Item{
+	Key: "foo",
+	Value: []byte(`bar`),
+})
+// handle err
+
+err = keyval.Get("foo")
+// handle err
+
+err = keyval.Delete("foo")
+```
