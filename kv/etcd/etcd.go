@@ -1,3 +1,4 @@
+// Package etcd is an etcd v3 implementation of kv
 package etcd
 
 import (

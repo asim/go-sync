@@ -1,3 +1,4 @@
+// Package consul is a consul implementation of kv
 package consul
 
 import (

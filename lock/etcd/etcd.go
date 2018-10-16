@@ -1,3 +1,4 @@
+// Package etcd is an etcd implementation of lock
 package etcd
 
 import (

@@ -1,3 +1,4 @@
+// Package consul is a consul implemenation of lock
 package consul
 
 import (
