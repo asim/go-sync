@@ -50,7 +50,7 @@ func NewKV(opts ...kv.Option) kv.KV {
 
 	var endpoints []string
 
-	for _, addr := range options.Addrs {
+	for _, addr := range options.Nodes {
 		if len(addr) > 0 {
 			endpoints = append(endpoints, addr)
 		}

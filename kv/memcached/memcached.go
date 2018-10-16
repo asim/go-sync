@@ -52,11 +52,11 @@ func NewKV(opts ...kv.Option) kv.KV {
 		o(&options)
 	}
 
-	if len(options.Addrs) == 0 {
-		options.Addrs = []string{"127.0.0.1:11211"}
+	if len(options.Nodes) == 0 {
+		options.Nodes = []string{"127.0.0.1:11211"}
 	}
 
 	return &mkv{
-		Client: mc.New(options.Addrs...),
+		Client: mc.New(options.Nodes...),
 	}
 }

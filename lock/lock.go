@@ -13,7 +13,7 @@ type Lock interface {
 }
 
 type Options struct {
-	Addrs []string
+	Nodes []string
 }
 
 type AcquireOptions struct {

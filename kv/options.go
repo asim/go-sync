@@ -1,11 +1,11 @@
 package kv
 
 type Options struct {
-	Addrs []string
+	Nodes []string
 }
 
-func Addrs(a ...string) Option {
+func Nodes(a ...string) Option {
 	return func(o *Options) {
-		o.Addrs = a
+		o.Nodes = a
 	}
 }

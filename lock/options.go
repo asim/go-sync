@@ -4,10 +4,10 @@ import (
 	"time"
 )
 
-// Addrs sets the addresses the underlying lock implementation
-func Addrs(a ...string) Option {
+// Nodes sets the addresses the underlying lock implementation
+func Nodes(a ...string) Option {
 	return func(o *Options) {
-		o.Addrs = append(o.Addrs, a...)
+		o.Nodes = append(o.Nodes, a...)
 	}
 }
 
