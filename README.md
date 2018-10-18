@@ -22,6 +22,8 @@ We offer three primitives; Lock, Leader and KV
 
 ## Locking
 
+The Lock interface provides distributed locking. Multiple instances attempting to lock the same id will block until available.
+
 ```go
 import "github.com/micro/go-sync/lock/consul"
 
@@ -37,6 +39,8 @@ err = lock.Release("id")
 ```
 
 ## Leadership
+
+Leader provides leadership election. Useful where one node needs to coordinate some action.
 
 ```go
 import (
@@ -71,6 +75,8 @@ e.Resign()
 ```
 
 ## Key-Value
+
+KV provides a simple interface for distributed key-value stores.
 
 ```go
 import (
