@@ -19,6 +19,7 @@ We offer three primitives; Lock, Leader and KV
 - [Locking](#locking) - exclusive resource access
 - [Leadership](#leadership) - single leader group coordination
 - [Key-Value](#key-value) - simple distributed data storage
+- [TODO](#todo) - TODO items
 
 ## Locking
 
@@ -97,3 +98,7 @@ err = keyval.Get("foo")
 
 err = keyval.Delete("foo")
 ```
+
+## TODO
+
+-  Kubernetes kv, lock and leader
