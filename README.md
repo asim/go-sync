@@ -93,7 +93,7 @@ err := keyval.Put(&kv.Item{
 })
 // handle err
 
-err = keyval.Get("foo")
+v, err := keyval.Get("foo")
 // handle err
 
 err = keyval.Delete("foo")
