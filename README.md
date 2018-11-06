@@ -8,18 +8,36 @@ Distributed systems by their very nature are decoupled and independent. In most 
 e.g Availability and Partitional tolerance but sacrificing consistency. In the case of microservices we often offload this concern to 
 an external database or eventing system. Go Sync provides a framework for synchronization which can be used in the application by the developer.
 
-We offer three primitives; Lock, Leader and KV
-
-- Lock -  distributed locking 
-- Leader - leadership election
-- KV - key value storage
-
 ## Getting Started
 
+- [Key-Value](#key-value) - simple distributed data storage
 - [Locking](#locking) - exclusive resource access
 - [Leadership](#leadership) - single leader group coordination
-- [Key-Value](#key-value) - simple distributed data storage
-- [TODO](#todo) - TODO items
+- [Time](#time) - provides synchronized time
+
+## Key-Value
+
+KV provides a simple interface for distributed key-value stores.
+
+```go
+import (
+	"github.com/micro/go-sync/kv"
+	"github.com/micro/go-sync/kv/consul"
+)
+
+keyval := consul.NewKV()
+
+err := keyval.Put(&kv.Item{
+	Key: "foo",
+	Value: []byte(`bar`),
+})
+// handle err
+
+v, err := keyval.Get("foo")
+// handle err
+
+err = keyval.Delete("foo")
+```
 
 ## Locking
 
@@ -75,30 +93,17 @@ for {
 e.Resign() 
 ```
 
-## Key-Value
+## Time
 
-KV provides a simple interface for distributed key-value stores.
+Time provides synchronized time. Local machines may have clock skew and time cannot be guaranteed to be the same everywhere. 
+Synchronized Time allows you to decide how time is defined for your applications.
 
 ```go
 import (
-	"github.com/micro/go-sync/kv"
-	"github.com/micro/go-sync/kv/consul"
+	"github.com/micro/go-sync/time/ntp"
 )
 
-keyval := consul.NewKV()
 
-err := keyval.Put(&kv.Item{
-	Key: "foo",
-	Value: []byte(`bar`),
-})
-// handle err
-
-v, err := keyval.Get("foo")
-// handle err
-
-err = keyval.Delete("foo")
+t := ntp.NewTime()
+time, err := t.Now()
 ```
-
-## TODO
-
--  Kubernetes kv, lock and leader
