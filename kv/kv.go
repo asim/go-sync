@@ -14,6 +14,7 @@ type KV interface {
 	Get(key string) (*Item, error)
 	Del(key string) error
 	Put(item *Item) error
+	List() ([]*Item, error)
 	String() string
 }
 

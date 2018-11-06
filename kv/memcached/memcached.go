@@ -1,6 +1,12 @@
 package memcached
 
 import (
+	"bufio"
+	"bytes"
+	"fmt"
+	"io"
+	"net"
+	"strings"
 	"time"
 
 	mc "github.com/bradfitz/gomemcache/memcache"
@@ -8,6 +14,7 @@ import (
 )
 
 type mkv struct {
+	Server *mc.ServerList
 	Client *mc.Client
 }
 
@@ -42,6 +49,97 @@ func (m *mkv) Put(item *kv.Item) error {
 	})
 }
 
+func (m *mkv) List() ([]*kv.Item, error) {
+	// stats
+	// cachedump
+	// get keys
+
+	var keys []string
+
+	//data := make(map[string]string)
+	if err := m.Server.Each(func(c net.Addr) error {
+		cc, err := net.Dial("tcp", c.String())
+		if err != nil {
+			return err
+		}
+		defer cc.Close()
+
+		b := bufio.NewReadWriter(bufio.NewReader(cc), bufio.NewWriter(cc))
+
+		// get items
+		if _, err := fmt.Fprintf(b, "stats items\r\n"); err != nil {
+			return err
+		}
+
+		b.Flush()
+
+		v, err := b.ReadSlice('\n')
+		if err != nil {
+			return err
+		}
+
+		parts := bytes.Split(v, []byte("\n"))
+		if len(parts) < 1 {
+			return nil
+		}
+		vals := strings.Split(string(parts[0]), ":")
+		items := vals[1]
+
+		// drain
+		for {
+			buf, err := b.ReadSlice('\n')
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				return err
+			}
+			if strings.HasPrefix(string(buf), "END") {
+				break
+			}
+		}
+
+		b.Writer.Reset(cc)
+		b.Reader.Reset(cc)
+
+		if _, err := fmt.Fprintf(b, "lru_crawler metadump %s\r\n", items); err != nil {
+			return err
+		}
+		b.Flush()
+
+		for {
+			v, err := b.ReadString('\n')
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				return err
+			}
+			if strings.HasPrefix(v, "END") {
+				break
+			}
+			key := strings.Split(v, " ")[0]
+			keys = append(keys, strings.TrimPrefix(key, "key="))
+		}
+
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+
+	var vals []*kv.Item
+
+	for _, k := range keys {
+		i, err := m.Get(k)
+		if err != nil {
+			return nil, err
+		}
+		vals = append(vals, i)
+	}
+
+	return vals, nil
+}
+
 func (m *mkv) String() string {
 	return "memcached"
 }
@@ -56,7 +154,11 @@ func NewKV(opts ...kv.Option) kv.KV {
 		options.Nodes = []string{"127.0.0.1:11211"}
 	}
 
+	ss := new(mc.ServerList)
+	ss.SetServers(options.Nodes...)
+
 	return &mkv{
+		Server: ss,
 		Client: mc.New(options.Nodes...),
 	}
 }

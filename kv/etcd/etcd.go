@@ -39,6 +39,24 @@ func (e *ekv) Put(item *kv.Item) error {
 	return err
 }
 
+func (e *ekv) List() ([]*kv.Item, error) {
+	keyval, err := e.kv.Get(context.Background(), "/", client.WithPrefix())
+	if err != nil {
+		return nil, err
+	}
+	var vals []*kv.Item
+	if keyval == nil || len(keyval.Kvs) == 0 {
+		return vals, nil
+	}
+	for _, keyv := range keyval.Kvs {
+		vals = append(vals, &kv.Item{
+			Key:   string(keyv.Key),
+			Value: keyv.Value,
+		})
+	}
+	return vals, nil
+}
+
 func (e *ekv) String() string {
 	return "etcd"
 }

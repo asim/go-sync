@@ -42,6 +42,24 @@ func (c *ckv) Put(item *kv.Item) error {
 	return err
 }
 
+func (c *ckv) List() ([]*kv.Item, error) {
+	keyval, _, err := c.client.KV().List("/", nil)
+	if err != nil {
+		return nil, err
+	}
+	if keyval == nil {
+		return nil, kv.ErrNotFound
+	}
+	var vals []*kv.Item
+	for _, keyv := range keyval {
+		vals = append(vals, &kv.Item{
+			Key:   keyv.Key,
+			Value: keyv.Value,
+		})
+	}
+	return vals, nil
+}
+
 func (c *ckv) String() string {
 	return "consul"
 }

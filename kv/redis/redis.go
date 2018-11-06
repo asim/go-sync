@@ -42,6 +42,22 @@ func (r *rkv) Put(item *kv.Item) error {
 	return r.Client.Set(item.Key, item.Value, item.Expiration).Err()
 }
 
+func (r *rkv) List() ([]*kv.Item, error) {
+	keys, err := r.Client.Keys("*").Result()
+	if err != nil {
+		return nil, err
+	}
+	var vals []*kv.Item
+	for _, k := range keys {
+		i, err := r.Get(k)
+		if err != nil {
+			return nil, err
+		}
+		vals = append(vals, i)
+	}
+	return vals, nil
+}
+
 func (r *rkv) String() string {
 	return "redis"
 }
