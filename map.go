@@ -100,8 +100,13 @@ func (m *syncMap) Range(fn func(key, val interface{}) error) error {
 
 		// unmarshal value
 		var val interface{}
-		if err := json.Unmarshal(keyval.Value, &val); err != nil {
-			return err
+
+		if len(keyval.Value) > 0 && keyval.Value[0] == '{' {
+			if err := json.Unmarshal(keyval.Value, &val); err != nil {
+				return err
+			}
+		} else {
+			val = keyval.Value
 		}
 
 		// exec func
@@ -121,10 +126,12 @@ func (m *syncMap) Range(fn func(key, val interface{}) error) error {
 		}
 
 		// set key
-		return m.opts.KV.Put(&kv.Item{
+		if err := m.opts.KV.Put(&kv.Item{
 			Key:   keyval.Key,
 			Value: b,
-		})
+		}); err != nil {
+			return err
+		}
 	}
 
 	return nil
