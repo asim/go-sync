@@ -129,13 +129,27 @@ func (m *mkv) List() ([]*kv.Item, error) {
 
 	var vals []*kv.Item
 
+	// concurrent op
+	ch := make(chan *kv.Item, len(keys))
+
 	for _, k := range keys {
-		i, err := m.Get(k)
-		if err != nil {
-			return nil, err
-		}
-		vals = append(vals, i)
+		go func(key string) {
+			i, _ := m.Get(key)
+			ch <- i
+		}(k)
 	}
+
+	for i := 0; i < len(keys); i++ {
+		item := <-ch
+
+		if item == nil {
+			continue
+		}
+
+		vals = append(vals, item)
+	}
+
+	close(ch)
 
 	return vals, nil
 }
