@@ -107,3 +107,8 @@ import (
 t := ntp.NewTime()
 time, err := t.Now()
 ```
+
+## TODO
+
+- Task interface - for distributed jobs
+- Cron interface - to schedule jobs
