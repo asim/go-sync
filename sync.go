@@ -5,6 +5,7 @@ import (
 	"github.com/micro/go-sync/kv"
 	"github.com/micro/go-sync/leader"
 	"github.com/micro/go-sync/lock"
+	"github.com/micro/go-sync/task"
 	"github.com/micro/go-sync/time"
 )
 
@@ -20,27 +21,16 @@ type Map interface {
 	Range(func(key, val interface{}) error) error
 }
 
-/*
-
-Soon
-
 // Cron is a distributed scheduler
 type Cron interface {
-	Schedule(Task) error
+	Schedule(task.Schedule, task.Command) error
 }
-
-// Task represents a function scheduled for execution
-type Task interface {
-	Name() string
-	Func() func() error
-	Tick() <-chan Time
-}
-*/
 
 type Options struct {
 	Leader leader.Leader
 	Lock   lock.Lock
 	KV     kv.KV
+	Task   task.Task
 	Time   time.Time
 }
 
