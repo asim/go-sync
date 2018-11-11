@@ -82,7 +82,7 @@ import (
 
 keyval := consul.NewStore()
 
-err := keyval.Put(&kv.Item{
+err := keyval.Put(&store.Item{
 	Key: "foo",
 	Value: []byte(`bar`),
 })
