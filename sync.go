@@ -2,9 +2,9 @@
 package sync
 
 import (
-	"github.com/micro/go-sync/kv"
 	"github.com/micro/go-sync/leader"
 	"github.com/micro/go-sync/lock"
+	"github.com/micro/go-sync/store"
 	"github.com/micro/go-sync/task"
 	"github.com/micro/go-sync/time"
 )
@@ -29,7 +29,7 @@ type Cron interface {
 type Options struct {
 	Leader leader.Leader
 	Lock   lock.Lock
-	KV     kv.KV
+	Store  store.Store
 	Task   task.Task
 	Time   time.Time
 }

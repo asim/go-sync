@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"github.com/micro/go-sync/kv"
+	"github.com/micro/go-sync/store"
 	redis "gopkg.in/redis.v3"
 )
 
@@ -9,17 +9,17 @@ type rkv struct {
 	Client *redis.Client
 }
 
-func (r *rkv) Get(key string) (*kv.Item, error) {
+func (r *rkv) Get(key string) (*store.Item, error) {
 	val, err := r.Client.Get(key).Bytes()
 
 	if err != nil && err == redis.Nil {
-		return nil, kv.ErrNotFound
+		return nil, store.ErrNotFound
 	} else if err != nil {
 		return nil, err
 	}
 
 	if val == nil {
-		return nil, kv.ErrNotFound
+		return nil, store.ErrNotFound
 	}
 
 	d, err := r.Client.TTL(key).Result()
@@ -27,7 +27,7 @@ func (r *rkv) Get(key string) (*kv.Item, error) {
 		return nil, err
 	}
 
-	return &kv.Item{
+	return &store.Item{
 		Key:        key,
 		Value:      val,
 		Expiration: d,
@@ -38,16 +38,16 @@ func (r *rkv) Del(key string) error {
 	return r.Client.Del(key).Err()
 }
 
-func (r *rkv) Put(item *kv.Item) error {
+func (r *rkv) Put(item *store.Item) error {
 	return r.Client.Set(item.Key, item.Value, item.Expiration).Err()
 }
 
-func (r *rkv) List() ([]*kv.Item, error) {
+func (r *rkv) List() ([]*store.Item, error) {
 	keys, err := r.Client.Keys("*").Result()
 	if err != nil {
 		return nil, err
 	}
-	var vals []*kv.Item
+	var vals []*store.Item
 	for _, k := range keys {
 		i, err := r.Get(k)
 		if err != nil {
@@ -62,8 +62,8 @@ func (r *rkv) String() string {
 	return "redis"
 }
 
-func NewKV(opts ...kv.Option) kv.KV {
-	var options kv.Options
+func NewStore(opts ...store.Option) store.Store {
+	var options store.Options
 	for _, o := range opts {
 		o(&options)
 	}

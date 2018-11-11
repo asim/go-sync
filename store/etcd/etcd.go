@@ -5,7 +5,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/micro/go-sync/kv"
+	"github.com/micro/go-sync/store"
 	client "go.etcd.io/etcd/clientv3"
 )
 
@@ -13,17 +13,17 @@ type ekv struct {
 	kv client.KV
 }
 
-func (e *ekv) Get(key string) (*kv.Item, error) {
+func (e *ekv) Get(key string) (*store.Item, error) {
 	keyval, err := e.kv.Get(context.Background(), key)
 	if err != nil {
 		return nil, err
 	}
 
 	if keyval == nil || len(keyval.Kvs) == 0 {
-		return nil, kv.ErrNotFound
+		return nil, store.ErrNotFound
 	}
 
-	return &kv.Item{
+	return &store.Item{
 		Key:   string(keyval.Kvs[0].Key),
 		Value: keyval.Kvs[0].Value,
 	}, nil
@@ -34,22 +34,22 @@ func (e *ekv) Del(key string) error {
 	return err
 }
 
-func (e *ekv) Put(item *kv.Item) error {
+func (e *ekv) Put(item *store.Item) error {
 	_, err := e.kv.Put(context.Background(), item.Key, string(item.Value))
 	return err
 }
 
-func (e *ekv) List() ([]*kv.Item, error) {
+func (e *ekv) List() ([]*store.Item, error) {
 	keyval, err := e.kv.Get(context.Background(), "/", client.WithPrefix())
 	if err != nil {
 		return nil, err
 	}
-	var vals []*kv.Item
+	var vals []*store.Item
 	if keyval == nil || len(keyval.Kvs) == 0 {
 		return vals, nil
 	}
 	for _, keyv := range keyval.Kvs {
-		vals = append(vals, &kv.Item{
+		vals = append(vals, &store.Item{
 			Key:   string(keyv.Key),
 			Value: keyv.Value,
 		})
@@ -61,8 +61,8 @@ func (e *ekv) String() string {
 	return "etcd"
 }
 
-func NewKV(opts ...kv.Option) kv.KV {
-	var options kv.Options
+func NewStore(opts ...store.Option) store.Store {
+	var options store.Options
 	for _, o := range opts {
 		o(&options)
 	}
