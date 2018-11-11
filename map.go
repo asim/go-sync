@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/micro/go-sync/kv"
-	ckv "github.com/micro/go-sync/kv/consul"
 	lock "github.com/micro/go-sync/lock/consul"
+	"github.com/micro/go-sync/store"
+	ckv "github.com/micro/go-sync/store/consul"
 )
 
 type syncMap struct {
@@ -34,7 +34,7 @@ func (m *syncMap) Load(key, val interface{}) error {
 	defer m.opts.Lock.Release(kstr)
 
 	// get key
-	kval, err := m.opts.KV.Get(kstr)
+	kval, err := m.opts.Store.Get(kstr)
 	if err != nil {
 		return err
 	}
@@ -63,7 +63,7 @@ func (m *syncMap) Store(key, val interface{}) error {
 	}
 
 	// set key
-	return m.opts.KV.Put(&kv.Item{
+	return m.opts.Store.Put(&store.Item{
 		Key:   kstr,
 		Value: b,
 	})
@@ -81,11 +81,11 @@ func (m *syncMap) Delete(key interface{}) error {
 		return err
 	}
 	defer m.opts.Lock.Release(kstr)
-	return m.opts.KV.Del(kstr)
+	return m.opts.Store.Del(kstr)
 }
 
 func (m *syncMap) Range(fn func(key, val interface{}) error) error {
-	keyvals, err := m.opts.KV.List()
+	keyvals, err := m.opts.Store.List()
 	if err != nil {
 		return err
 	}
@@ -126,7 +126,7 @@ func (m *syncMap) Range(fn func(key, val interface{}) error) error {
 		}
 
 		// set key
-		if err := m.opts.KV.Put(&kv.Item{
+		if err := m.opts.Store.Put(&store.Item{
 			Key:   keyval.Key,
 			Value: b,
 		}); err != nil {
@@ -147,8 +147,8 @@ func NewMap(opts ...Option) Map {
 		options.Lock = lock.NewLock()
 	}
 
-	if options.KV == nil {
-		options.KV = ckv.NewKV()
+	if options.Store == nil {
+		options.Store = ckv.NewStore()
 	}
 
 	return &syncMap{

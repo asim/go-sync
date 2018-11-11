@@ -6,24 +6,24 @@ import (
 	"net"
 
 	"github.com/hashicorp/consul/api"
-	"github.com/micro/go-sync/kv"
+	"github.com/micro/go-sync/store"
 )
 
 type ckv struct {
 	client *api.Client
 }
 
-func (c *ckv) Get(key string) (*kv.Item, error) {
+func (c *ckv) Get(key string) (*store.Item, error) {
 	keyval, _, err := c.client.KV().Get(key, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	if keyval == nil {
-		return nil, kv.ErrNotFound
+		return nil, store.ErrNotFound
 	}
 
-	return &kv.Item{
+	return &store.Item{
 		Key:   keyval.Key,
 		Value: keyval.Value,
 	}, nil
@@ -34,7 +34,7 @@ func (c *ckv) Del(key string) error {
 	return err
 }
 
-func (c *ckv) Put(item *kv.Item) error {
+func (c *ckv) Put(item *store.Item) error {
 	_, err := c.client.KV().Put(&api.KVPair{
 		Key:   item.Key,
 		Value: item.Value,
@@ -42,17 +42,17 @@ func (c *ckv) Put(item *kv.Item) error {
 	return err
 }
 
-func (c *ckv) List() ([]*kv.Item, error) {
+func (c *ckv) List() ([]*store.Item, error) {
 	keyval, _, err := c.client.KV().List("/", nil)
 	if err != nil {
 		return nil, err
 	}
 	if keyval == nil {
-		return nil, kv.ErrNotFound
+		return nil, store.ErrNotFound
 	}
-	var vals []*kv.Item
+	var vals []*store.Item
 	for _, keyv := range keyval {
-		vals = append(vals, &kv.Item{
+		vals = append(vals, &store.Item{
 			Key:   keyv.Key,
 			Value: keyv.Value,
 		})
@@ -64,8 +64,8 @@ func (c *ckv) String() string {
 	return "consul"
 }
 
-func NewKV(opts ...kv.Option) kv.KV {
-	var options kv.Options
+func NewStore(opts ...store.Option) store.Store {
+	var options store.Options
 	for _, o := range opts {
 		o(&options)
 	}

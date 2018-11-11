@@ -1,4 +1,4 @@
-package kv
+package store
 
 type Options struct {
 	Nodes []string

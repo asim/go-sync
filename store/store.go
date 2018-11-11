@@ -1,5 +1,5 @@
-// Package kv is an interface for key-value storage.
-package kv
+// Package store is an interface for key-value storage.
+package store
 
 import (
 	"errors"
@@ -10,7 +10,7 @@ var (
 	ErrNotFound = errors.New("not found")
 )
 
-type KV interface {
+type Store interface {
 	Get(key string) (*Item, error)
 	Del(key string) error
 	Put(item *Item) error

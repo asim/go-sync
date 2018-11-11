@@ -21,11 +21,11 @@ KV provides a simple interface for distributed key-value stores.
 
 ```go
 import (
-	"github.com/micro/go-sync/kv"
-	"github.com/micro/go-sync/kv/consul"
+	"github.com/micro/go-sync/store"
+	"github.com/micro/go-sync/store/consul"
 )
 
-keyval := consul.NewKV()
+keyval := consul.NewStore()
 
 err := keyval.Put(&kv.Item{
 	Key: "foo",

@@ -1,9 +1,9 @@
 package sync
 
 import (
-	"github.com/micro/go-sync/kv"
 	"github.com/micro/go-sync/leader"
 	"github.com/micro/go-sync/lock"
+	"github.com/micro/go-sync/store"
 	"github.com/micro/go-sync/time"
 )
 
@@ -19,9 +19,9 @@ func WithLock(l lock.Lock) Option {
 	}
 }
 
-func WithKV(kv kv.KV) Option {
+func WithStore(s store.Store) Option {
 	return func(o *Options) {
-		o.KV = kv
+		o.Store = s
 	}
 }
 
