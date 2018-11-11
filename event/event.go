@@ -7,6 +7,7 @@ type Event interface {
 	Log(id string) (Log, error)
 }
 
+// Log is an individual event log
 type Log interface {
 	// Close the log handle
 	Close() error
