@@ -9,7 +9,9 @@ import (
 	"github.com/micro/go-sync/time"
 )
 
-// Map provides synchronized access to key-value
+// Map provides synchronized access to key-value storage.
+// It uses the store interface and lock interface to 
+// provide a consistent storage mechanism.
 type Map interface {
 	// Load value with given key
 	Load(key, val interface{}) error
@@ -21,7 +23,9 @@ type Map interface {
 	Range(func(key, val interface{}) error) error
 }
 
-// Cron is a distributed scheduler
+// Cron is a distributed scheduler using leader election
+// and distributed task runners. It uses the leader and 
+// task interfaces.
 type Cron interface {
 	Schedule(task.Schedule, task.Command) error
 }
