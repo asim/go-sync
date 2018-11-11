@@ -3,12 +3,15 @@ package event
 
 // Event provides a distributed log interface
 type Event interface {
-	Log(name string) (Log, error)
+	// Log retrieves the log with an id/name
+	Log(id string) (Log, error)
 }
 
 type Log interface {
 	// Close the log handle
 	Close() error
+	// Log ID
+	Id() string
 	// Read will read the next record
 	Read() (*Record, error)
 	// Go to an offset
