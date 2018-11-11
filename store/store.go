@@ -10,6 +10,7 @@ var (
 	ErrNotFound = errors.New("not found")
 )
 
+// Store is a distributed key-value store interface
 type Store interface {
 	Get(key string) (*Item, error)
 	Del(key string) error
