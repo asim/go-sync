@@ -136,3 +136,6 @@ t := ntp.NewTime()
 time, err := t.Now()
 ```
 
+## TODO
+
+- Event package - strongly consistent event stream e.g kafka
