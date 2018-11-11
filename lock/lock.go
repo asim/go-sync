@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Lock is a distributed locking interfac
+// Lock is a distributed locking interface
 type Lock interface {
 	// Acquire a lock with given id
 	Acquire(id string, opts ...AcquireOption) error
