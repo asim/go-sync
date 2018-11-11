@@ -70,3 +70,10 @@ func (s Schedule) Run() <-chan time.Time {
 func (s Schedule) String() string {
 	return fmt.Sprintf("%d-%d", s.Time.Unix(), s.Interval)
 }
+
+// WithPool sets the pool size for concurrent work
+func WithPool(i int) Option {
+	return func(o *Options) {
+		o.Pool = i
+	}
+}
