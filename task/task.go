@@ -9,8 +9,6 @@ import (
 type Task interface {
 	// Run runs a command immediately until completion
 	Run(Command) error
-	// Schedule defers the execution of a command
-	Schedule(Schedule, Command) error
 	// Status provides status of last execution
 	Status() string
 }
@@ -30,3 +28,28 @@ type Options struct {
 }
 
 type Option func(o *Options)
+
+func (s Schedule) Run() <-chan time.Time {
+	d := s.Time.Sub(time.Now())
+
+	ch := make(chan time.Time, 1)
+
+	go func() {
+		// wait for start time
+		<-time.After(d)
+
+		// zero interval
+		if s.Interval == time.Duration(0) {
+			ch <- time.Now()
+			close(ch)
+			return
+		}
+
+		// start ticker
+		for t := range time.Tick(s.Interval) {
+			ch <- t
+		}
+	}()
+
+	return ch
+}
