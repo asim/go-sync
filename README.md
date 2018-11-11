@@ -10,14 +10,14 @@ an external database or eventing system. Go Sync provides a framework for synchr
 
 ## Getting Started
 
-- [Key-Value](#key-value) - simple distributed data storage
+- [Key-Val](#key-value) - simple distributed data storage
 - [Locking](#locking) - exclusive resource access
 - [Leadership](#leadership) - single leader group coordination
 - [Time](#time) - provides synchronized time
 
-## Key-Value
+## Key-Val
 
-KV provides a simple interface for distributed key-value stores.
+Store provides a simple interface for distributed key-value stores.
 
 ```go
 import (
