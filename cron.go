@@ -6,7 +6,9 @@ import (
 	"time"
 
 	"github.com/micro/go-log"
+	"github.com/micro/go-sync/lock/consul"
 	"github.com/micro/go-sync/task"
+	"github.com/micro/go-sync/task/local"
 )
 
 type syncCron struct {
@@ -57,4 +59,23 @@ func (c *syncCron) Schedule(s task.Schedule, t task.Command) error {
 	}()
 
 	return nil
+}
+
+func NewCron(opts ...Option) Cron {
+	var options Options
+	for _, o := range opts {
+		o(&options)
+	}
+
+	if options.Lock == nil {
+		options.Lock = consul.NewLock()
+	}
+
+	if options.Task == nil {
+		options.Task = local.NewTask()
+	}
+
+	return &syncCron{
+		opts: options,
+	}
 }

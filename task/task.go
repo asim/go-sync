@@ -34,6 +34,10 @@ type Options struct {
 
 type Option func(o *Options)
 
+func (c Command) Execute() error {
+	return c.Func()
+}
+
 func (c Command) String() string {
 	return c.Name
 }
