@@ -1,6 +1,7 @@
 // Package leader provides leader election
 package leader
 
+// Leader provides leadership election
 type Leader interface {
 	// elect leader
 	Elect(id string, opts ...ElectOption) (Elected, error)
