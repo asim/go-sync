@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/micro/go-log"
-	"github.com/micro/go-sync/lock/consul"
+	"github.com/micro/go-sync/leader/consul"
 	"github.com/micro/go-sync/task"
 	"github.com/micro/go-sync/task/local"
 )
@@ -48,8 +48,16 @@ func (c *syncCron) Schedule(s task.Schedule, t task.Command) error {
 			for {
 				select {
 				// schedule tick
-				case <-tc:
-					c.opts.Task.Run(t)
+				case _, ok := <-tc:
+					// ticked once
+					if !ok {
+						break
+					}
+
+					log.Logf("[cron] executing command %s", t.Name)
+					if err := c.opts.Task.Run(t); err != nil {
+						log.Logf("[cron] error executing command %s: %v", t.Name, err)
+					}
 				// leader revoked
 				case <-r:
 					break
@@ -67,8 +75,8 @@ func NewCron(opts ...Option) Cron {
 		o(&options)
 	}
 
-	if options.Lock == nil {
-		options.Lock = consul.NewLock()
+	if options.Leader == nil {
+		options.Leader = consul.NewLeader()
 	}
 
 	if options.Task == nil {
