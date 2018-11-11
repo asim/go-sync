@@ -12,6 +12,8 @@ type Leader interface {
 type Elected interface {
 	// id of leader
 	Id() string
+	// seek re-election
+	Reelect() error
 	// resign leadership
 	Resign() error
 	// observe leadership revocation

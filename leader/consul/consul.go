@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"path"
+	"sync"
 
 	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/watch"
@@ -23,7 +24,9 @@ type consulElected struct {
 	id   string
 	key  string
 	opts leader.ElectOptions
-	rv   <-chan struct{}
+
+	mtx sync.RWMutex
+	rv  <-chan struct{}
 }
 
 func (c *consulLeader) Elect(id string, opts ...leader.ElectOption) (leader.Elected, error) {
@@ -92,11 +95,26 @@ func (c *consulElected) Id() string {
 	return c.id
 }
 
+func (c *consulElected) Reelect() error {
+	rv, err := c.l.Lock(nil)
+	if err != nil {
+		return err
+	}
+
+	c.mtx.Lock()
+	c.rv = rv
+	c.mtx.Unlock()
+	return nil
+}
+
 func (c *consulElected) Revoked() chan bool {
 	ch := make(chan bool, 1)
+	c.mtx.RLock()
+	rv := c.rv
+	c.mtx.RUnlock()
 
 	go func() {
-		<-c.rv
+		<-rv
 		ch <- true
 		close(ch)
 	}()

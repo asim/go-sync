@@ -81,6 +81,11 @@ func (e *etcdLeader) String() string {
 	return "etcd"
 }
 
+func (e *etcdElected) Reelect() error {
+	ctx, _ := context.WithCancel(context.Background())
+	return e.e.Campaign(ctx, e.id)
+}
+
 func (e *etcdElected) Revoked() chan bool {
 	ch := make(chan bool, 1)
 	ech := e.e.Observe(context.Background())
