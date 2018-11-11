@@ -14,7 +14,7 @@ type Log interface {
 	// Go to an offset
 	Seek(offset int64) error
 	// Write an event to the log
-	Write(Record) error
+	Write(*Record) error
 }
 
 type Record struct {
