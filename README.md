@@ -23,7 +23,7 @@ The Lock interface provides distributed locking. Multiple instances attempting t
 ```go
 import "github.com/micro/go-sync/lock/consul"
 
-l := consul.NewLock()
+lock := consul.NewLock()
 
 // acquire lock
 err := lock.Acquire("id")
