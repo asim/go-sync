@@ -10,36 +10,13 @@ an external database or eventing system. Go Sync provides a framework for synchr
 
 ## Getting Started
 
-- [Key-Val](#key-value) - simple distributed data storage
-- [Locking](#locking) - exclusive resource access
-- [Leadership](#leadership) - single leader group coordination
+- [Lock](#lock) - distributed locking for exclusive resource access
+- [Leader](#leader) - leadership election for group coordination
+- [Store](#store) - simple distributed data storage
+- [Task](#task) - distributed job execution
 - [Time](#time) - provides synchronized time
 
-## Key-Val
-
-Store provides a simple interface for distributed key-value stores.
-
-```go
-import (
-	"github.com/micro/go-sync/store"
-	"github.com/micro/go-sync/store/consul"
-)
-
-keyval := consul.NewStore()
-
-err := keyval.Put(&kv.Item{
-	Key: "foo",
-	Value: []byte(`bar`),
-})
-// handle err
-
-v, err := keyval.Get("foo")
-// handle err
-
-err = keyval.Delete("foo")
-```
-
-## Locking
+## Lock
 
 The Lock interface provides distributed locking. Multiple instances attempting to lock the same id will block until available.
 
@@ -57,7 +34,7 @@ err = lock.Release("id")
 // handle err
 ```
 
-## Leadership
+## Leader
 
 Leader provides leadership election. Useful where one node needs to coordinate some action.
 
@@ -91,6 +68,57 @@ for {
 
 // resign leadership
 e.Resign() 
+```
+
+## Store
+
+Store provides a simple interface for distributed key-value stores.
+
+```go
+import (
+	"github.com/micro/go-sync/store"
+	"github.com/micro/go-sync/store/consul"
+)
+
+keyval := consul.NewStore()
+
+err := keyval.Put(&kv.Item{
+	Key: "foo",
+	Value: []byte(`bar`),
+})
+// handle err
+
+v, err := keyval.Get("foo")
+// handle err
+
+err = keyval.Delete("foo")
+```
+
+## Task
+
+Task provides distributed job execution. It's a simple way to distribute work across a coordinated pool of workers.
+
+```go
+import (
+	"github.com/micro/go-sync/task"
+	"github.com/micro/go-sync/task/local"
+)
+
+t := local.NewTask(
+	task.WithPool(10),
+)
+
+err := t.Run(task.Command{
+	Name: "atask",
+	Func: func() error {
+		// exec some work
+		return nil
+	},
+})
+
+if err != nil {
+	// do something
+}
 ```
 
 ## Time
