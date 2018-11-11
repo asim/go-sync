@@ -35,7 +35,7 @@ func (c *consulLeader) Elect(id string, opts ...leader.ElectOption) (leader.Elec
 		o(&options)
 	}
 
-	key := path.Join("/micro/leader", c.opts.Group)
+	key := path.Join("micro/leader", c.opts.Group)
 
 	lc, err := c.c.LockOpts(&api.LockOptions{
 		Key:   key,
