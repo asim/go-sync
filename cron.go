@@ -45,13 +45,14 @@ func (c *syncCron) Schedule(s task.Schedule, t task.Command) error {
 			r := e.Revoked()
 
 			// execute the task
+		Tick:
 			for {
 				select {
 				// schedule tick
 				case _, ok := <-tc:
 					// ticked once
 					if !ok {
-						break
+						break Tick
 					}
 
 					log.Logf("[cron] executing command %s", t.Name)
@@ -60,9 +61,12 @@ func (c *syncCron) Schedule(s task.Schedule, t task.Command) error {
 					}
 				// leader revoked
 				case <-r:
-					break
+					break Tick
 				}
 			}
+
+			// resign
+			e.Resign()
 		}
 	}()
 
