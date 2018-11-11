@@ -6,7 +6,6 @@ type Leader interface {
 	Elect(id string, opts ...ElectOption) (Elected, error)
 	// follow the leader
 	Follow() chan string
-	String() string
 }
 
 type Elected interface {

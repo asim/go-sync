@@ -16,7 +16,6 @@ type Store interface {
 	Del(key string) error
 	Put(item *Item) error
 	List() ([]*Item, error)
-	String() string
 }
 
 type Item struct {

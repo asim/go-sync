@@ -9,7 +9,6 @@ import (
 type Lock interface {
 	Acquire(id string, opts ...AcquireOption) error
 	Release(id string) error
-	String() string
 }
 
 type Options struct {
