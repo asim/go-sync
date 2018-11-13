@@ -34,12 +34,12 @@ func (e *ekv) Delete(key string) error {
 	return err
 }
 
-func (e *ekv) Save(record *data.Record) error {
+func (e *ekv) Write(record *data.Record) error {
 	_, err := e.kv.Put(context.Background(), record.Key, string(record.Value))
 	return err
 }
 
-func (e *ekv) List() ([]*data.Record, error) {
+func (e *ekv) Dump() ([]*data.Record, error) {
 	keyval, err := e.kv.Get(context.Background(), "/", client.WithPrefix())
 	if err != nil {
 		return nil, err

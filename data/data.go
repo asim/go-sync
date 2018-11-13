@@ -10,11 +10,15 @@ var (
 	ErrNotFound = errors.New("not found")
 )
 
-// Data is a distributed data storage interface
+// Data is a data storage interface
 type Data interface {
+	// Dump the known records
+	Dump() ([]*Record, error)
+	// Read a record with key
 	Read(key string) (*Record, error)
-	Save(r *Record) error
-	List() ([]*Record, error)
+	// Write a record
+	Write(r *Record) error
+	// Delete a record with key
 	Delete(key string) error
 }
 

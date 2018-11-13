@@ -34,7 +34,7 @@ func (c *ckv) Delete(key string) error {
 	return err
 }
 
-func (c *ckv) Save(record *data.Record) error {
+func (c *ckv) Write(record *data.Record) error {
 	_, err := c.client.KV().Put(&api.KVPair{
 		Key:   record.Key,
 		Value: record.Value,
@@ -42,7 +42,7 @@ func (c *ckv) Save(record *data.Record) error {
 	return err
 }
 
-func (c *ckv) List() ([]*data.Record, error) {
+func (c *ckv) Dump() ([]*data.Record, error) {
 	keyval, _, err := c.client.KV().List("/", nil)
 	if err != nil {
 		return nil, err

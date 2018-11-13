@@ -20,7 +20,7 @@ func ekey(k interface{}) string {
 	return base64.StdEncoding.EncodeToString(b)
 }
 
-func (m *syncDB) Load(key, val interface{}) error {
+func (m *syncDB) Read(key, val interface{}) error {
 	if key == nil {
 		return fmt.Errorf("key is nil")
 	}
@@ -43,7 +43,7 @@ func (m *syncDB) Load(key, val interface{}) error {
 	return json.Unmarshal(kval.Value, val)
 }
 
-func (m *syncDB) Store(key, val interface{}) error {
+func (m *syncDB) Write(key, val interface{}) error {
 	if key == nil {
 		return fmt.Errorf("key is nil")
 	}
@@ -63,7 +63,7 @@ func (m *syncDB) Store(key, val interface{}) error {
 	}
 
 	// set key
-	return m.opts.Data.Save(&data.Record{
+	return m.opts.Data.Write(&data.Record{
 		Key:   kstr,
 		Value: b,
 	})
@@ -84,8 +84,8 @@ func (m *syncDB) Delete(key interface{}) error {
 	return m.opts.Data.Delete(kstr)
 }
 
-func (m *syncDB) Range(fn func(key, val interface{}) error) error {
-	keyvals, err := m.opts.Data.List()
+func (m *syncDB) Iterate(fn func(key, val interface{}) error) error {
+	keyvals, err := m.opts.Data.Dump()
 	if err != nil {
 		return err
 	}
@@ -126,7 +126,7 @@ func (m *syncDB) Range(fn func(key, val interface{}) error) error {
 		}
 
 		// set key
-		if err := m.opts.Data.Save(&data.Record{
+		if err := m.opts.Data.Write(&data.Record{
 			Key:   keyval.Key,
 			Value: b,
 		}); err != nil {

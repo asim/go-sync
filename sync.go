@@ -13,14 +13,14 @@ import (
 // It uses the data interface and lock interface to
 // provide a consistent storage mechanism.
 type DB interface {
-	// Load value with given key
-	Load(key, val interface{}) error
-	// Store value with given key
-	Store(key, val interface{}) error
+	// Read value with given key
+	Read(key, val interface{}) error
+	// Write value with given key
+	Write(key, val interface{}) error
 	// Delete value with given key
 	Delete(key interface{}) error
-	// Range over all key/vals. Value changes are saved
-	Range(func(key, val interface{}) error) error
+	// Iterate over all key/vals. Value changes are saved
+	Iterate(func(key, val interface{}) error) error
 }
 
 // Cron is a distributed scheduler using leader election

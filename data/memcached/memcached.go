@@ -41,7 +41,7 @@ func (m *mkv) Delete(key string) error {
 	return m.Client.Delete(key)
 }
 
-func (m *mkv) Save(record *data.Record) error {
+func (m *mkv) Write(record *data.Record) error {
 	return m.Client.Set(&mc.Item{
 		Key:        record.Key,
 		Value:      record.Value,
@@ -49,7 +49,7 @@ func (m *mkv) Save(record *data.Record) error {
 	})
 }
 
-func (m *mkv) List() ([]*data.Record, error) {
+func (m *mkv) Dump() ([]*data.Record, error) {
 	// stats
 	// cachedump
 	// get keys

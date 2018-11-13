@@ -38,11 +38,11 @@ func (r *rkv) Delete(key string) error {
 	return r.Client.Del(key).Err()
 }
 
-func (r *rkv) Save(record *data.Record) error {
+func (r *rkv) Write(record *data.Record) error {
 	return r.Client.Set(record.Key, record.Value, record.Expiration).Err()
 }
 
-func (r *rkv) List() ([]*data.Record, error) {
+func (r *rkv) Dump() ([]*data.Record, error) {
 	keys, err := r.Client.Keys("*").Result()
 	if err != nil {
 		return nil, err
