@@ -12,7 +12,7 @@ an external database or eventing system. Go Sync provides a framework for synchr
 
 - [Lock](#lock) - distributed locking for exclusive resource access
 - [Leader](#leader) - leadership election for group coordination
-- [Store](#store) - simple distributed data storage
+- [Data](#data) - simple distributed data storage
 - [Task](#task) - distributed job execution
 - [Time](#time) - provides synchronized time
 
@@ -70,25 +70,25 @@ for {
 e.Resign() 
 ```
 
-## Store
+## Data
 
-Store provides a simple interface for distributed key-value stores.
+Data provides a simple interface for distributed data storage.
 
 ```go
 import (
-	"github.com/micro/go-sync/store"
-	"github.com/micro/go-sync/store/consul"
+	"github.com/micro/go-sync/data"
+	"github.com/micro/go-sync/data/consul"
 )
 
-keyval := consul.NewStore()
+keyval := consul.NewData()
 
-err := keyval.Put(&store.Item{
+err := keyval.Write(&data.Record{
 	Key: "foo",
 	Value: []byte(`bar`),
 })
 // handle err
 
-v, err := keyval.Get("foo")
+v, err := keyval.Read("foo")
 // handle err
 
 err = keyval.Delete("foo")

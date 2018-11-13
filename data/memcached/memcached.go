@@ -10,7 +10,7 @@ import (
 	"time"
 
 	mc "github.com/bradfitz/gomemcache/memcache"
-	"github.com/micro/go-sync/store"
+	"github.com/micro/go-sync/data"
 )
 
 type mkv struct {
@@ -18,38 +18,38 @@ type mkv struct {
 	Client *mc.Client
 }
 
-func (m *mkv) Get(key string) (*store.Item, error) {
+func (m *mkv) Read(key string) (*data.Record, error) {
 	keyval, err := m.Client.Get(key)
 	if err != nil && err == mc.ErrCacheMiss {
-		return nil, store.ErrNotFound
+		return nil, data.ErrNotFound
 	} else if err != nil {
 		return nil, err
 	}
 
 	if keyval == nil {
-		return nil, store.ErrNotFound
+		return nil, data.ErrNotFound
 	}
 
-	return &store.Item{
+	return &data.Record{
 		Key:        keyval.Key,
 		Value:      keyval.Value,
 		Expiration: time.Second * time.Duration(keyval.Expiration),
 	}, nil
 }
 
-func (m *mkv) Del(key string) error {
+func (m *mkv) Delete(key string) error {
 	return m.Client.Delete(key)
 }
 
-func (m *mkv) Put(item *store.Item) error {
+func (m *mkv) Write(record *data.Record) error {
 	return m.Client.Set(&mc.Item{
-		Key:        item.Key,
-		Value:      item.Value,
-		Expiration: int32(item.Expiration.Seconds()),
+		Key:        record.Key,
+		Value:      record.Value,
+		Expiration: int32(record.Expiration.Seconds()),
 	})
 }
 
-func (m *mkv) List() ([]*store.Item, error) {
+func (m *mkv) Dump() ([]*data.Record, error) {
 	// stats
 	// cachedump
 	// get keys
@@ -66,8 +66,8 @@ func (m *mkv) List() ([]*store.Item, error) {
 
 		b := bufio.NewReadWriter(bufio.NewReader(cc), bufio.NewWriter(cc))
 
-		// get items
-		if _, err := fmt.Fprintf(b, "stats items\r\n"); err != nil {
+		// get records
+		if _, err := fmt.Fprintf(b, "stats records\r\n"); err != nil {
 			return err
 		}
 
@@ -83,7 +83,7 @@ func (m *mkv) List() ([]*store.Item, error) {
 			return nil
 		}
 		vals := strings.Split(string(parts[0]), ":")
-		items := vals[1]
+		records := vals[1]
 
 		// drain
 		for {
@@ -102,7 +102,7 @@ func (m *mkv) List() ([]*store.Item, error) {
 		b.Writer.Reset(cc)
 		b.Reader.Reset(cc)
 
-		if _, err := fmt.Fprintf(b, "lru_crawler metadump %s\r\n", items); err != nil {
+		if _, err := fmt.Fprintf(b, "lru_crawler metadump %s\r\n", records); err != nil {
 			return err
 		}
 		b.Flush()
@@ -127,26 +127,26 @@ func (m *mkv) List() ([]*store.Item, error) {
 		return nil, err
 	}
 
-	var vals []*store.Item
+	var vals []*data.Record
 
 	// concurrent op
-	ch := make(chan *store.Item, len(keys))
+	ch := make(chan *data.Record, len(keys))
 
 	for _, k := range keys {
 		go func(key string) {
-			i, _ := m.Get(key)
+			i, _ := m.Read(key)
 			ch <- i
 		}(k)
 	}
 
 	for i := 0; i < len(keys); i++ {
-		item := <-ch
+		record := <-ch
 
-		if item == nil {
+		if record == nil {
 			continue
 		}
 
-		vals = append(vals, item)
+		vals = append(vals, record)
 	}
 
 	close(ch)
@@ -158,8 +158,8 @@ func (m *mkv) String() string {
 	return "memcached"
 }
 
-func NewStore(opts ...store.Option) store.Store {
-	var options store.Options
+func NewData(opts ...data.Option) data.Data {
+	var options data.Options
 	for _, o := range opts {
 		o(&options)
 	}

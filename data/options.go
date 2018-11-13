@@ -1,4 +1,4 @@
-package store
+package data
 
 type Options struct {
 	Nodes []string

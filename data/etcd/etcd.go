@@ -5,7 +5,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/micro/go-sync/store"
+	"github.com/micro/go-sync/data"
 	client "go.etcd.io/etcd/clientv3"
 )
 
@@ -13,43 +13,43 @@ type ekv struct {
 	kv client.KV
 }
 
-func (e *ekv) Get(key string) (*store.Item, error) {
+func (e *ekv) Read(key string) (*data.Record, error) {
 	keyval, err := e.kv.Get(context.Background(), key)
 	if err != nil {
 		return nil, err
 	}
 
 	if keyval == nil || len(keyval.Kvs) == 0 {
-		return nil, store.ErrNotFound
+		return nil, data.ErrNotFound
 	}
 
-	return &store.Item{
+	return &data.Record{
 		Key:   string(keyval.Kvs[0].Key),
 		Value: keyval.Kvs[0].Value,
 	}, nil
 }
 
-func (e *ekv) Del(key string) error {
+func (e *ekv) Delete(key string) error {
 	_, err := e.kv.Delete(context.Background(), key)
 	return err
 }
 
-func (e *ekv) Put(item *store.Item) error {
-	_, err := e.kv.Put(context.Background(), item.Key, string(item.Value))
+func (e *ekv) Write(record *data.Record) error {
+	_, err := e.kv.Put(context.Background(), record.Key, string(record.Value))
 	return err
 }
 
-func (e *ekv) List() ([]*store.Item, error) {
+func (e *ekv) Dump() ([]*data.Record, error) {
 	keyval, err := e.kv.Get(context.Background(), "/", client.WithPrefix())
 	if err != nil {
 		return nil, err
 	}
-	var vals []*store.Item
+	var vals []*data.Record
 	if keyval == nil || len(keyval.Kvs) == 0 {
 		return vals, nil
 	}
 	for _, keyv := range keyval.Kvs {
-		vals = append(vals, &store.Item{
+		vals = append(vals, &data.Record{
 			Key:   string(keyv.Key),
 			Value: keyv.Value,
 		})
@@ -61,8 +61,8 @@ func (e *ekv) String() string {
 	return "etcd"
 }
 
-func NewStore(opts ...store.Option) store.Store {
-	var options store.Options
+func NewData(opts ...data.Option) data.Data {
+	var options data.Options
 	for _, o := range opts {
 		o(&options)
 	}

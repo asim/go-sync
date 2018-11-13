@@ -6,12 +6,12 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/micro/go-sync/data"
+	ckv "github.com/micro/go-sync/data/consul"
 	lock "github.com/micro/go-sync/lock/consul"
-	"github.com/micro/go-sync/store"
-	ckv "github.com/micro/go-sync/store/consul"
 )
 
-type syncMap struct {
+type syncDB struct {
 	opts Options
 }
 
@@ -20,7 +20,7 @@ func ekey(k interface{}) string {
 	return base64.StdEncoding.EncodeToString(b)
 }
 
-func (m *syncMap) Load(key, val interface{}) error {
+func (m *syncDB) Read(key, val interface{}) error {
 	if key == nil {
 		return fmt.Errorf("key is nil")
 	}
@@ -34,7 +34,7 @@ func (m *syncMap) Load(key, val interface{}) error {
 	defer m.opts.Lock.Release(kstr)
 
 	// get key
-	kval, err := m.opts.Store.Get(kstr)
+	kval, err := m.opts.Data.Read(kstr)
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (m *syncMap) Load(key, val interface{}) error {
 	return json.Unmarshal(kval.Value, val)
 }
 
-func (m *syncMap) Store(key, val interface{}) error {
+func (m *syncDB) Write(key, val interface{}) error {
 	if key == nil {
 		return fmt.Errorf("key is nil")
 	}
@@ -63,13 +63,13 @@ func (m *syncMap) Store(key, val interface{}) error {
 	}
 
 	// set key
-	return m.opts.Store.Put(&store.Item{
+	return m.opts.Data.Write(&data.Record{
 		Key:   kstr,
 		Value: b,
 	})
 }
 
-func (m *syncMap) Delete(key interface{}) error {
+func (m *syncDB) Delete(key interface{}) error {
 	if key == nil {
 		return fmt.Errorf("key is nil")
 	}
@@ -81,11 +81,11 @@ func (m *syncMap) Delete(key interface{}) error {
 		return err
 	}
 	defer m.opts.Lock.Release(kstr)
-	return m.opts.Store.Del(kstr)
+	return m.opts.Data.Delete(kstr)
 }
 
-func (m *syncMap) Range(fn func(key, val interface{}) error) error {
-	keyvals, err := m.opts.Store.List()
+func (m *syncDB) Iterate(fn func(key, val interface{}) error) error {
+	keyvals, err := m.opts.Data.Dump()
 	if err != nil {
 		return err
 	}
@@ -126,7 +126,7 @@ func (m *syncMap) Range(fn func(key, val interface{}) error) error {
 		}
 
 		// set key
-		if err := m.opts.Store.Put(&store.Item{
+		if err := m.opts.Data.Write(&data.Record{
 			Key:   keyval.Key,
 			Value: b,
 		}); err != nil {
@@ -137,7 +137,7 @@ func (m *syncMap) Range(fn func(key, val interface{}) error) error {
 	return nil
 }
 
-func NewMap(opts ...Option) Map {
+func NewDB(opts ...Option) DB {
 	var options Options
 	for _, o := range opts {
 		o(&options)
@@ -147,11 +147,11 @@ func NewMap(opts ...Option) Map {
 		options.Lock = lock.NewLock()
 	}
 
-	if options.Store == nil {
-		options.Store = ckv.NewStore()
+	if options.Data == nil {
+		options.Data = ckv.NewData()
 	}
 
-	return &syncMap{
+	return &syncDB{
 		opts: options,
 	}
 }

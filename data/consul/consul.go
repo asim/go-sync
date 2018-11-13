@@ -6,53 +6,53 @@ import (
 	"net"
 
 	"github.com/hashicorp/consul/api"
-	"github.com/micro/go-sync/store"
+	"github.com/micro/go-sync/data"
 )
 
 type ckv struct {
 	client *api.Client
 }
 
-func (c *ckv) Get(key string) (*store.Item, error) {
+func (c *ckv) Read(key string) (*data.Record, error) {
 	keyval, _, err := c.client.KV().Get(key, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	if keyval == nil {
-		return nil, store.ErrNotFound
+		return nil, data.ErrNotFound
 	}
 
-	return &store.Item{
+	return &data.Record{
 		Key:   keyval.Key,
 		Value: keyval.Value,
 	}, nil
 }
 
-func (c *ckv) Del(key string) error {
+func (c *ckv) Delete(key string) error {
 	_, err := c.client.KV().Delete(key, nil)
 	return err
 }
 
-func (c *ckv) Put(item *store.Item) error {
+func (c *ckv) Write(record *data.Record) error {
 	_, err := c.client.KV().Put(&api.KVPair{
-		Key:   item.Key,
-		Value: item.Value,
+		Key:   record.Key,
+		Value: record.Value,
 	}, nil)
 	return err
 }
 
-func (c *ckv) List() ([]*store.Item, error) {
+func (c *ckv) Dump() ([]*data.Record, error) {
 	keyval, _, err := c.client.KV().List("/", nil)
 	if err != nil {
 		return nil, err
 	}
 	if keyval == nil {
-		return nil, store.ErrNotFound
+		return nil, data.ErrNotFound
 	}
-	var vals []*store.Item
+	var vals []*data.Record
 	for _, keyv := range keyval {
-		vals = append(vals, &store.Item{
+		vals = append(vals, &data.Record{
 			Key:   keyv.Key,
 			Value: keyv.Value,
 		})
@@ -64,8 +64,8 @@ func (c *ckv) String() string {
 	return "consul"
 }
 
-func NewStore(opts ...store.Option) store.Store {
-	var options store.Options
+func NewData(opts ...data.Option) data.Data {
+	var options data.Options
 	for _, o := range opts {
 		o(&options)
 	}
