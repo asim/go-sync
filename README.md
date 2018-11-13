@@ -10,9 +10,9 @@ an external database or eventing system. Go Sync provides a framework for synchr
 
 ## Getting Started
 
-- [Lock](#lock) - distributed locking for exclusive resource access
-- [Leader](#leader) - leadership election for group coordination
 - [Data](#data) - simple distributed data storage
+- [Leader](#leader) - leadership election for group coordination
+- [Lock](#lock) - distributed locking for exclusive resource access
 - [Task](#task) - distributed job execution
 - [Time](#time) - provides synchronized time
 
