@@ -10,7 +10,7 @@ import (
 	"time"
 
 	mc "github.com/bradfitz/gomemcache/memcache"
-	"github.com/micro/go-sync/store"
+	"github.com/micro/go-sync/data"
 )
 
 type mkv struct {
@@ -18,19 +18,19 @@ type mkv struct {
 	Client *mc.Client
 }
 
-func (m *mkv) Get(key string) (*store.Item, error) {
+func (m *mkv) Get(key string) (*data.Item, error) {
 	keyval, err := m.Client.Get(key)
 	if err != nil && err == mc.ErrCacheMiss {
-		return nil, store.ErrNotFound
+		return nil, data.ErrNotFound
 	} else if err != nil {
 		return nil, err
 	}
 
 	if keyval == nil {
-		return nil, store.ErrNotFound
+		return nil, data.ErrNotFound
 	}
 
-	return &store.Item{
+	return &data.Item{
 		Key:        keyval.Key,
 		Value:      keyval.Value,
 		Expiration: time.Second * time.Duration(keyval.Expiration),
@@ -41,7 +41,7 @@ func (m *mkv) Del(key string) error {
 	return m.Client.Delete(key)
 }
 
-func (m *mkv) Put(item *store.Item) error {
+func (m *mkv) Put(item *data.Item) error {
 	return m.Client.Set(&mc.Item{
 		Key:        item.Key,
 		Value:      item.Value,
@@ -49,7 +49,7 @@ func (m *mkv) Put(item *store.Item) error {
 	})
 }
 
-func (m *mkv) List() ([]*store.Item, error) {
+func (m *mkv) List() ([]*data.Item, error) {
 	// stats
 	// cachedump
 	// get keys
@@ -127,10 +127,10 @@ func (m *mkv) List() ([]*store.Item, error) {
 		return nil, err
 	}
 
-	var vals []*store.Item
+	var vals []*data.Item
 
 	// concurrent op
-	ch := make(chan *store.Item, len(keys))
+	ch := make(chan *data.Item, len(keys))
 
 	for _, k := range keys {
 		go func(key string) {
@@ -158,8 +158,8 @@ func (m *mkv) String() string {
 	return "memcached"
 }
 
-func NewStore(opts ...store.Option) store.Store {
-	var options store.Options
+func NewData(opts ...data.Option) data.Data {
+	var options data.Options
 	for _, o := range opts {
 		o(&options)
 	}

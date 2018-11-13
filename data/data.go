@@ -1,5 +1,5 @@
-// Package store is an interface for key-value storage.
-package store
+// Package data is an interface for key-value storage.
+package data
 
 import (
 	"errors"
@@ -10,8 +10,8 @@ var (
 	ErrNotFound = errors.New("not found")
 )
 
-// Store is a distributed key-value store interface
-type Store interface {
+// Data is a distributed key-value store interface
+type Data interface {
 	Get(key string) (*Item, error)
 	Del(key string) error
 	Put(item *Item) error
