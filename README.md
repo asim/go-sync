@@ -82,13 +82,13 @@ import (
 
 keyval := consul.NewData()
 
-err := keyval.Put(&data.Record{
+err := keyval.Save(&data.Record{
 	Key: "foo",
 	Value: []byte(`bar`),
 })
 // handle err
 
-v, err := keyval.Get("foo")
+v, err := keyval.Read("foo")
 // handle err
 
 err = keyval.Delete("foo")
