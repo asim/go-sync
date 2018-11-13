@@ -72,7 +72,7 @@ e.Resign()
 
 ## Data
 
-Data provides a simple interface for distributed key-value stores.
+Data provides a simple interface for distributed data storage.
 
 ```go
 import (
