@@ -12,7 +12,7 @@ an external database or eventing system. Go Sync provides a framework for synchr
 
 - [Lock](#lock) - distributed locking for exclusive resource access
 - [Leader](#leader) - leadership election for group coordination
-- [Data](#store) - simple distributed data storage
+- [Data](#data) - simple distributed data storage
 - [Task](#task) - distributed job execution
 - [Time](#time) - provides synchronized time
 
@@ -82,7 +82,7 @@ import (
 
 keyval := consul.NewData()
 
-err := keyval.Put(&store.Item{
+err := keyval.Put(&data.Item{
 	Key: "foo",
 	Value: []byte(`bar`),
 })
