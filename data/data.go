@@ -10,7 +10,7 @@ var (
 	ErrNotFound = errors.New("not found")
 )
 
-// Data is a distributed key-value store interface
+// Data is a distributed data storage interface
 type Data interface {
 	Read(key string) (*Record, error)
 	Save(r *Record) error
