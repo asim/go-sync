@@ -34,7 +34,7 @@ func (m *syncDB) Load(key, val interface{}) error {
 	defer m.opts.Lock.Release(kstr)
 
 	// get key
-	kval, err := m.opts.Data.Get(kstr)
+	kval, err := m.opts.Data.Read(kstr)
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (m *syncDB) Load(key, val interface{}) error {
 	return json.Unmarshal(kval.Value, val)
 }
 
-func (m *syncDB) Data(key, val interface{}) error {
+func (m *syncDB) Store(key, val interface{}) error {
 	if key == nil {
 		return fmt.Errorf("key is nil")
 	}
@@ -63,7 +63,7 @@ func (m *syncDB) Data(key, val interface{}) error {
 	}
 
 	// set key
-	return m.opts.Data.Put(&data.Record{
+	return m.opts.Data.Save(&data.Record{
 		Key:   kstr,
 		Value: b,
 	})
@@ -81,7 +81,7 @@ func (m *syncDB) Delete(key interface{}) error {
 		return err
 	}
 	defer m.opts.Lock.Release(kstr)
-	return m.opts.Data.Del(kstr)
+	return m.opts.Data.Delete(kstr)
 }
 
 func (m *syncDB) Range(fn func(key, val interface{}) error) error {
@@ -126,7 +126,7 @@ func (m *syncDB) Range(fn func(key, val interface{}) error) error {
 		}
 
 		// set key
-		if err := m.opts.Data.Put(&data.Record{
+		if err := m.opts.Data.Save(&data.Record{
 			Key:   keyval.Key,
 			Value: b,
 		}); err != nil {

@@ -15,8 +15,8 @@ import (
 type DB interface {
 	// Load value with given key
 	Load(key, val interface{}) error
-	// Data value with given key
-	Data(key, val interface{}) error
+	// Store value with given key
+	Store(key, val interface{}) error
 	// Delete value with given key
 	Delete(key interface{}) error
 	// Range over all key/vals. Value changes are saved
