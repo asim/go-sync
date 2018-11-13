@@ -9,7 +9,7 @@ type rkv struct {
 	Client *redis.Client
 }
 
-func (r *rkv) Get(key string) (*data.Item, error) {
+func (r *rkv) Read(key string) (*data.Record, error) {
 	val, err := r.Client.Get(key).Bytes()
 
 	if err != nil && err == redis.Nil {
@@ -27,29 +27,29 @@ func (r *rkv) Get(key string) (*data.Item, error) {
 		return nil, err
 	}
 
-	return &data.Item{
+	return &data.Record{
 		Key:        key,
 		Value:      val,
 		Expiration: d,
 	}, nil
 }
 
-func (r *rkv) Del(key string) error {
+func (r *rkv) Delete(key string) error {
 	return r.Client.Del(key).Err()
 }
 
-func (r *rkv) Put(item *data.Item) error {
-	return r.Client.Set(item.Key, item.Value, item.Expiration).Err()
+func (r *rkv) Save(record *data.Record) error {
+	return r.Client.Set(record.Key, record.Value, record.Expiration).Err()
 }
 
-func (r *rkv) List() ([]*data.Item, error) {
+func (r *rkv) List() ([]*data.Record, error) {
 	keys, err := r.Client.Keys("*").Result()
 	if err != nil {
 		return nil, err
 	}
-	var vals []*data.Item
+	var vals []*data.Record
 	for _, k := range keys {
-		i, err := r.Get(k)
+		i, err := r.Read(k)
 		if err != nil {
 			return nil, err
 		}

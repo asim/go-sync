@@ -18,7 +18,7 @@ type mkv struct {
 	Client *mc.Client
 }
 
-func (m *mkv) Get(key string) (*data.Item, error) {
+func (m *mkv) Read(key string) (*data.Record, error) {
 	keyval, err := m.Client.Get(key)
 	if err != nil && err == mc.ErrCacheMiss {
 		return nil, data.ErrNotFound
@@ -30,26 +30,26 @@ func (m *mkv) Get(key string) (*data.Item, error) {
 		return nil, data.ErrNotFound
 	}
 
-	return &data.Item{
+	return &data.Record{
 		Key:        keyval.Key,
 		Value:      keyval.Value,
 		Expiration: time.Second * time.Duration(keyval.Expiration),
 	}, nil
 }
 
-func (m *mkv) Del(key string) error {
+func (m *mkv) Delete(key string) error {
 	return m.Client.Delete(key)
 }
 
-func (m *mkv) Put(item *data.Item) error {
+func (m *mkv) Save(record *data.Record) error {
 	return m.Client.Set(&mc.Item{
-		Key:        item.Key,
-		Value:      item.Value,
-		Expiration: int32(item.Expiration.Seconds()),
+		Key:        record.Key,
+		Value:      record.Value,
+		Expiration: int32(record.Expiration.Seconds()),
 	})
 }
 
-func (m *mkv) List() ([]*data.Item, error) {
+func (m *mkv) List() ([]*data.Record, error) {
 	// stats
 	// cachedump
 	// get keys
@@ -66,8 +66,8 @@ func (m *mkv) List() ([]*data.Item, error) {
 
 		b := bufio.NewReadWriter(bufio.NewReader(cc), bufio.NewWriter(cc))
 
-		// get items
-		if _, err := fmt.Fprintf(b, "stats items\r\n"); err != nil {
+		// get records
+		if _, err := fmt.Fprintf(b, "stats records\r\n"); err != nil {
 			return err
 		}
 
@@ -83,7 +83,7 @@ func (m *mkv) List() ([]*data.Item, error) {
 			return nil
 		}
 		vals := strings.Split(string(parts[0]), ":")
-		items := vals[1]
+		records := vals[1]
 
 		// drain
 		for {
@@ -102,7 +102,7 @@ func (m *mkv) List() ([]*data.Item, error) {
 		b.Writer.Reset(cc)
 		b.Reader.Reset(cc)
 
-		if _, err := fmt.Fprintf(b, "lru_crawler metadump %s\r\n", items); err != nil {
+		if _, err := fmt.Fprintf(b, "lru_crawler metadump %s\r\n", records); err != nil {
 			return err
 		}
 		b.Flush()
@@ -127,26 +127,26 @@ func (m *mkv) List() ([]*data.Item, error) {
 		return nil, err
 	}
 
-	var vals []*data.Item
+	var vals []*data.Record
 
 	// concurrent op
-	ch := make(chan *data.Item, len(keys))
+	ch := make(chan *data.Record, len(keys))
 
 	for _, k := range keys {
 		go func(key string) {
-			i, _ := m.Get(key)
+			i, _ := m.Read(key)
 			ch <- i
 		}(k)
 	}
 
 	for i := 0; i < len(keys); i++ {
-		item := <-ch
+		record := <-ch
 
-		if item == nil {
+		if record == nil {
 			continue
 		}
 
-		vals = append(vals, item)
+		vals = append(vals, record)
 	}
 
 	close(ch)

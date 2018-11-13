@@ -12,13 +12,14 @@ var (
 
 // Data is a distributed key-value store interface
 type Data interface {
-	Get(key string) (*Item, error)
-	Del(key string) error
-	Put(item *Item) error
-	List() ([]*Item, error)
+	Read(key string) (*Record, error)
+	Save(r *Record) error
+	List() ([]*Record, error)
+	Delete(key string) error
 }
 
-type Item struct {
+// Record represents a data record
+type Record struct {
 	Key        string
 	Value      []byte
 	Expiration time.Duration

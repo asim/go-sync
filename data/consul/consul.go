@@ -13,7 +13,7 @@ type ckv struct {
 	client *api.Client
 }
 
-func (c *ckv) Get(key string) (*data.Item, error) {
+func (c *ckv) Read(key string) (*data.Record, error) {
 	keyval, _, err := c.client.KV().Get(key, nil)
 	if err != nil {
 		return nil, err
@@ -23,26 +23,26 @@ func (c *ckv) Get(key string) (*data.Item, error) {
 		return nil, data.ErrNotFound
 	}
 
-	return &data.Item{
+	return &data.Record{
 		Key:   keyval.Key,
 		Value: keyval.Value,
 	}, nil
 }
 
-func (c *ckv) Del(key string) error {
+func (c *ckv) Delete(key string) error {
 	_, err := c.client.KV().Delete(key, nil)
 	return err
 }
 
-func (c *ckv) Put(item *data.Item) error {
+func (c *ckv) Save(record *data.Record) error {
 	_, err := c.client.KV().Put(&api.KVPair{
-		Key:   item.Key,
-		Value: item.Value,
+		Key:   record.Key,
+		Value: record.Value,
 	}, nil)
 	return err
 }
 
-func (c *ckv) List() ([]*data.Item, error) {
+func (c *ckv) List() ([]*data.Record, error) {
 	keyval, _, err := c.client.KV().List("/", nil)
 	if err != nil {
 		return nil, err
@@ -50,9 +50,9 @@ func (c *ckv) List() ([]*data.Item, error) {
 	if keyval == nil {
 		return nil, data.ErrNotFound
 	}
-	var vals []*data.Item
+	var vals []*data.Record
 	for _, keyv := range keyval {
-		vals = append(vals, &data.Item{
+		vals = append(vals, &data.Record{
 			Key:   keyv.Key,
 			Value: keyv.Value,
 		})

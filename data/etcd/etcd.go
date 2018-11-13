@@ -13,7 +13,7 @@ type ekv struct {
 	kv client.KV
 }
 
-func (e *ekv) Get(key string) (*data.Item, error) {
+func (e *ekv) Read(key string) (*data.Record, error) {
 	keyval, err := e.kv.Get(context.Background(), key)
 	if err != nil {
 		return nil, err
@@ -23,33 +23,33 @@ func (e *ekv) Get(key string) (*data.Item, error) {
 		return nil, data.ErrNotFound
 	}
 
-	return &data.Item{
+	return &data.Record{
 		Key:   string(keyval.Kvs[0].Key),
 		Value: keyval.Kvs[0].Value,
 	}, nil
 }
 
-func (e *ekv) Del(key string) error {
+func (e *ekv) Delete(key string) error {
 	_, err := e.kv.Delete(context.Background(), key)
 	return err
 }
 
-func (e *ekv) Put(item *data.Item) error {
-	_, err := e.kv.Put(context.Background(), item.Key, string(item.Value))
+func (e *ekv) Save(record *data.Record) error {
+	_, err := e.kv.Put(context.Background(), record.Key, string(record.Value))
 	return err
 }
 
-func (e *ekv) List() ([]*data.Item, error) {
+func (e *ekv) List() ([]*data.Record, error) {
 	keyval, err := e.kv.Get(context.Background(), "/", client.WithPrefix())
 	if err != nil {
 		return nil, err
 	}
-	var vals []*data.Item
+	var vals []*data.Record
 	if keyval == nil || len(keyval.Kvs) == 0 {
 		return vals, nil
 	}
 	for _, keyv := range keyval.Kvs {
-		vals = append(vals, &data.Item{
+		vals = append(vals, &data.Record{
 			Key:   string(keyv.Key),
 			Value: keyv.Value,
 		})

@@ -63,7 +63,7 @@ func (m *syncDB) Data(key, val interface{}) error {
 	}
 
 	// set key
-	return m.opts.Data.Put(&data.Item{
+	return m.opts.Data.Put(&data.Record{
 		Key:   kstr,
 		Value: b,
 	})
@@ -126,7 +126,7 @@ func (m *syncDB) Range(fn func(key, val interface{}) error) error {
 		}
 
 		// set key
-		if err := m.opts.Data.Put(&data.Item{
+		if err := m.opts.Data.Put(&data.Record{
 			Key:   keyval.Key,
 			Value: b,
 		}); err != nil {
