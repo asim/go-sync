@@ -110,5 +110,6 @@ func NewLock(opts ...lock.Option) lock.Lock {
 		path:   "/micro/lock",
 		client: c,
 		opts:   options,
+		locks:  make(map[string]*elock),
 	}
 }
