@@ -88,6 +88,6 @@ func NewLock(opts ...lock.Option) lock.Lock {
 	return &redisLock{
 		locks: make(map[string]*redsync.Mutex),
 		opts:  options,
-		c: rpool,
+		c:     rpool,
 	}
 }
