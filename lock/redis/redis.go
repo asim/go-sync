@@ -31,7 +31,7 @@ func (r *redisLock) Acquire(id string, opts ...lock.AcquireOption) error {
 		ropts = append(ropts, redsync.SetTries(1))
 	}
 
-	if options.TTL <= time.Duration(0) {
+	if options.TTL > time.Duration(0) {
 		ropts = append(ropts, redsync.SetExpiry(options.TTL))
 	}
 
@@ -56,9 +56,10 @@ func (r *redisLock) Release(id string) error {
 		return errors.New("lock not found")
 	}
 
-	err := m.Unlock()
+	unlocked := m.Unlock()
 	delete(r.locks, id)
-	if err != false {
+
+	if !unlocked {
 		return errors.New("lock not unlocked")
 	}
 
