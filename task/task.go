@@ -2,6 +2,7 @@
 package task
 
 import (
+	"context"
 	"fmt"
 	"time"
 )
@@ -29,7 +30,10 @@ type Schedule struct {
 }
 
 type Options struct {
+	// Pool size for workers
 	Pool int
+	// Alternative options
+	Context context.Context
 }
 
 type Option func(o *Options)
