@@ -88,7 +88,7 @@ func NewLock(opts ...lock.Option) lock.Lock {
 		addr, port, err := net.SplitHostPort(options.Nodes[0])
 		if ae, ok := err.(*net.AddrError); ok && ae.Err == "missing port in address" {
 			port = "8500"
-			config.Address = fmt.Sprintf("%s:%s", addr, port)
+			config.Address = fmt.Sprintf("%s:%s", ae.Addr, port)
 		} else if err == nil {
 			config.Address = fmt.Sprintf("%s:%s", addr, port)
 		}
