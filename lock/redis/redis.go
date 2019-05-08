@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/go-redsync/redsync"
 	"github.com/micro/go-sync/lock"
-	"gopkg.in/redsync.v1"
 )
 
 type redisLock struct {
