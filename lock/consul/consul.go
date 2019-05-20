@@ -36,7 +36,7 @@ func (c *consulLock) Acquire(id string, opts ...lock.AcquireOption) error {
 	}
 
 	l, err := c.c.LockOpts(&api.LockOptions{
-		Key:          id,
+		Key:          c.opts.Prefix + id,
 		LockWaitTime: options.Wait,
 		SessionTTL:   ttl,
 	})

@@ -11,6 +11,13 @@ func Nodes(a ...string) Option {
 	}
 }
 
+// Prefix sets a prefix to any lock ids used
+func Prefix(p string) Option {
+	return func(o *Options) {
+		o.Prefix = p
+	}
+}
+
 // TTL sets the lock ttl
 func TTL(t time.Duration) AcquireOption {
 	return func(o *AcquireOptions) {

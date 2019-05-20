@@ -35,7 +35,7 @@ func (e *etcdLock) Acquire(id string, opts ...lock.AcquireOption) error {
 	}
 
 	// make path
-	path := path.Join(e.path, strings.Replace(id, "/", "-", -1))
+	path := path.Join(e.path, strings.Replace(e.opts.Prefix+id, "/", "-", -1))
 
 	var sopts []cc.SessionOption
 	if options.TTL > 0 {

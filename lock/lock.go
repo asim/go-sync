@@ -14,7 +14,8 @@ type Lock interface {
 }
 
 type Options struct {
-	Nodes []string
+	Nodes  []string
+	Prefix string
 }
 
 type AcquireOptions struct {

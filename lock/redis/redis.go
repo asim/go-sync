@@ -35,7 +35,7 @@ func (r *redisLock) Acquire(id string, opts ...lock.AcquireOption) error {
 		ropts = append(ropts, redsync.SetExpiry(options.TTL))
 	}
 
-	m := r.c.NewMutex(id, ropts...)
+	m := r.c.NewMutex(r.opts.Prefix+id, ropts...)
 	err := m.Lock()
 	if err != nil {
 		return err
